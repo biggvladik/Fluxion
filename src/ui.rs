@@ -1,5 +1,5 @@
 use crate::app::MyApp;
-use egui::{Align, Frame, Layout, Rounding, Vec2, Rect};
+use egui::{Frame, Rounding, Vec2, Rect};
 use egui_plot::{Plot, Line, PlotPoints};
 
 pub enum UiEvent {
