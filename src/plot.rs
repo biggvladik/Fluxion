@@ -13,7 +13,6 @@ impl PlotData {
 
     pub fn add_point(&mut self, value: f64) {
         let x = self.points.len() as f64;
-
         self.points.push([x, value]);
         self.t_otgona = value;
 

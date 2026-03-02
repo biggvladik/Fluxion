@@ -1,21 +1,17 @@
-use crossbeam_channel::{unbounded, Receiver};
 use crate::serial::SerialManager;
 use crate::plot::PlotData;
+use crate::ui::{draw_ui, UiEvent};
 
 pub struct MyApp {
     pub serial: SerialManager,
     pub plot: PlotData,
-    pub receiver: Receiver<f64>,
 }
 
 impl MyApp {
     pub fn new() -> Self {
-        let (tx, rx) = unbounded();
-
         Self {
-            serial: SerialManager::new(tx),
+            serial: SerialManager::new(),
             plot: PlotData::new(),
-            receiver: rx,
         }
     }
 }
@@ -23,15 +19,17 @@ impl MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
 
-        // Получаем данные из потока
-        while let Ok(value) = self.receiver.try_recv() {
-            self.plot.add_point(value);
-        }
+        let events = draw_ui(self, ctx);
 
-        crate::ui::draw_ui(self, ctx);
-
-        if self.serial.live_mode {
-            ctx.request_repaint();
+        for event in events {
+            match event {
+                UiEvent::Open => self.serial.open(),
+                UiEvent::Close => self.serial.close(),
+                UiEvent::Refresh => self.serial.refresh_ports(),
+                UiEvent::Single => {}, // можно добавить генерацию точки
+                UiEvent::Live => {},   // пока нет
+                UiEvent::Stop => {},   // пока нет
+            }
         }
     }
 }
