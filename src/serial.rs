@@ -1,8 +1,10 @@
-use serialport::SerialPortInfo;
+use serialport::{SerialPort, SerialPortInfo};
+use std::time::Duration;
 
 pub struct SerialManager {
     pub ports: Vec<SerialPortInfo>,
     pub selected_port: Option<String>,
+    port: Option<Box<dyn SerialPort>>,
 }
 
 impl SerialManager {
@@ -10,18 +12,43 @@ impl SerialManager {
         Self {
             ports: serialport::available_ports().unwrap_or_default(),
             selected_port: None,
+            port: None,
         }
     }
 
-    pub fn refresh_ports(&mut self) {
-        self.ports = serialport::available_ports().unwrap_or_default();
+    /// Обнаружение доступных COM портов
+    pub fn refresh_ports(&mut self) -> Result<(), serialport::Error> {
+        self.ports = serialport::available_ports()?;
+        Ok(())
     }
 
-    pub fn open(&mut self) {
-        println!("Port opened");
+    /// Открытие выбранного COM порта
+    pub fn open(&mut self, baud_rate: u32) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(port_name) = &self.selected_port {
+            let port = serialport::new(port_name, baud_rate)
+                .timeout(Duration::from_millis(1000))
+                .open()?;
+
+            self.port = Some(port);
+            println!("Port {} opened", port_name);
+            Ok(())
+        } else {
+            Err("No port selected".into())
+        }
     }
 
+    /// Закрытие COM порта
     pub fn close(&mut self) {
-        println!("Port closed");
+        if self.port.is_some() {
+            self.port = None; // Drop автоматически закроет порт
+            println!("Port closed");
+        } else {
+            println!("No port is currently open");
+        }
+    }
+
+    /// Проверка — открыт ли порт
+    pub fn is_open(&self) -> bool {
+        self.port.is_some()
     }
 }

@@ -54,7 +54,7 @@ pub fn draw_ui(app: &mut MyApp, ctx: &egui::Context) -> Vec<UiEvent> {
                                     .selected_text(
                                         app.serial.selected_port
                                             .clone()
-                                            .unwrap_or("COM1".to_string()),
+                                            .unwrap_or("---".to_string()),
                                     )
                                     .show_ui(ui, |ui| {
                                         for port in &app.serial.ports {
