@@ -12,14 +12,14 @@ impl GasDriver {
             api: GasApi::new(dll_path)?,
         })
     }
-
+    #[allow(dead_code)]
     fn utf16(s: &str) -> Vec<u16> {
         OsStr::new(s)
             .encode_wide()
             .chain(Some(0))
             .collect()
     }
-
+    #[allow(dead_code)]
     fn c_string(s: &str) -> CString {
         CString::new(s).unwrap()
     }
@@ -91,5 +91,16 @@ impl GasDriver {
         }
 
         Self::read_c_string(buf.as_ptr())
+    }
+    #[allow(dead_code)]
+    pub fn get_warning(&self) -> String {
+        let mut buf = [0i8; 128];
+
+        unsafe {
+            (self.api.get_warning)(buf.as_mut_ptr());
+        }
+
+        let c_str = unsafe { CStr::from_ptr(buf.as_ptr()) };
+        c_str.to_string_lossy().into_owned()
     }
 }
