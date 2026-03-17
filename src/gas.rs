@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 /// Обертка для GAS.dll
 pub struct GasApi {
-    _lib: Arc<Library>, // библиотека живет столько же, сколько структура
+    _lib: Arc<Library>,
 
     pub start: Symbol<'static, unsafe extern "system" fn(*mut c_int) -> c_int>,
     pub init: Symbol<'static, unsafe extern "system" fn(*mut c_int) -> c_int>,

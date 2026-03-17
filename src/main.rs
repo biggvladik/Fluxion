@@ -17,6 +17,10 @@ fn main() {
 
     println!("DLL loaded successfully!");
 
+    // Загрузка параметров
+    driver.load_param();
+
+
     // Запуск GAS
     match driver.start() {
         Ok(_) => println!("GAS start OK"),
@@ -35,7 +39,7 @@ fn main() {
         Err(code) => eprintln!("Failed to get spectrum, code = {}", code),
     }
 
-    // Получение последней ошибки и предупреждения через новое API
+    // Получение последней ошибки и предупреждения
     let last_error = driver.get_error();
     let last_warning = driver.get_warning();
 
